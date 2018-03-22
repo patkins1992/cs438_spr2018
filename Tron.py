@@ -8,6 +8,8 @@ Classes:
 
 """
 from random import randint 
+from matplotlib import pyplot as plt
+import numpy as np
 #------------------------------Node-------------------------------------------
 class Node:
     """
@@ -28,7 +30,7 @@ class Node:
          
 #------------------------Grid-------------------------------------------------
 class Grid:          
-    def __init__(self,players=[], grid_size=50):
+    def __init__(self,players=[], grid_size=1):
         self.grid=[]                        #Grid of Node objects
         self.players_path =[]               #List of [Player,[x-cord],[y-cord]]
         self.active_players=players         #Players still in the game
@@ -74,31 +76,79 @@ class Grid:
                     self.grid[x][y].right = "bnd"
         return
                 
-    def move_players(self): #Check if dident move*********
+    def move_players(self): 
+        #Step 1 Move all the active players
         for player in self.active_players:
             player.move() #Player moves themself to their next node
-        for player in self.active_players:
-            if player.node == "bnd" or player.node.visited: #Player hit a wall and should be removed from game
-                self.defeted_players.append(player)         #Move player to the list of defeted players
-                self.active_players.remove(player)          #Remove Player from list of active players
+        #Step 2 Remove players that hit an obstical in their move
+        players_to_remove=[]
+        for player in self.active_players: #Traverse all the active players
+            #Checks 1 and 2 Check for simple collision.
+            if player.node == "bnd": #Check 2-----------hit a boundry---------------------------------------------------
+                players_to_remove.append(player)
+                print("Cause of death of Player " +player.color+": Player hit a boundry")
+            elif player.node.visited: #Check 1--------------hit a wall-----------------------------------------------------
+               players_to_remove.append(player)
+               self.add_curr_node_to_path(player)          #Adds node to players current path
+               print("Cause of death of Player " +player.color+": Player hit a wall")
             else:
-                player.node.visited=True            #Sets the node the player moved to as visited
-                self.add_curr_node_to_path(player)  #Adds node to players current path
+                #Checks 3 & 4 iterative checks for mutual collisions or stalls
+                for other_player in self.active_players: #check if there was a mutual collision.
+                    if other_player.node is player.node and other_player is not player and player not in players_to_remove:
+                        players_to_remove.append(player)
+                        self.add_curr_node_to_path(player)          #Adds node to players current path
+                        print("Cause of death of Player " +player.color+" : Mutual Collision")
+                for prev_player in self.players_path: # check that player has move
+                    if prev_player[0] is player:
+                        if [prev_player[1][-1],prev_player[2][-1]]==player.node.cordinate and player not in players_to_remove:
+                            self.defeted_players.append(player)         #Move player to the list of defeted players
+                            players_to_remove.append(player)
+                            print("Cause of death of Player " +player.color+": Player dident move")
+                #Player Survived
+                if player not in players_to_remove:
+                    player.node.visited=True            #Sets the node the player moved to as visited
+                    self.add_curr_node_to_path(player)  #Adds node to players current path
+        #Remove players
+        for player_to_remove in players_to_remove:
+            self.defeted_players.append(player_to_remove)
+            self.active_players.remove(player_to_remove)
+            player.node.visited=True #If mutual collision need to set to true
+        
+        return
                     
     def add_curr_node_to_path(self,player):
         for a_player in self.players_path:
             if a_player[0] is player:
                 a_player[1].append(player.node.cordinate[0])
-                a_player[2].append(player.node.cordinate[0])
+                a_player[2].append(player.node.cordinate[1])
+        return
      
-    def display_the_grid(self,fig=None,ax=None, paths = []):
-        ###ANIMATION???###
-        for x in self.grid:
-           for y in x:
-               if y.visited:print('X ',end='')
-               else: print("0 ",end='')
-           print()        
-        print("------------------------")
+    def display_the_grid(self,fig=None):
+        #Initilization-------------------------------------------
+        if fig == None: #if no figure has been create figure
+            fig = plt.figure()
+        if fig.axes.__len__() == 0: # if no axies create axes
+            fig.add_axes(plt.axes(xlim=(-.5,self.grid.__len__()-1+.5)
+                                 ,ylim=(-.5,self.grid.__len__()-1+.5)))
+            ax= fig.gca()
+            ax.set_xticks(np.arange(0, self.grid.__len__(), self.grid.__len__()/10),minor=False)
+            ax.set_yticks(np.arange(0, self.grid.__len__(), self.grid.__len__()/10),minor=False)
+            ax.set_xticks(np.arange(0, self.grid.__len__(), 1),minor=True)
+            ax.set_yticks(np.arange(0, self.grid.__len__(), 1),minor=True)
+            plt.grid(which='both')
+        if fig.axes[0].lines.__len__() == 0: # if no lines create lines
+            for player in self.players_path:
+                fig.axes[0].plot(player[1],player[2],player[0].color)#player=[player object,x_cor,y_cord]
+            
+            fig.axes[0].plot([-.25,-.25,self.grid.__len__()-1+.25,self.grid.__len__()-1+.25,-.25],
+                             [-.25,self.grid.__len__()-1+.25,self.grid.__len__()-1+.25,-.25,-.25],'k') #Plot an actual boundry
+        #End Initilization------------------------------------------
+        else:
+            for i in range(self.players_path.__len__()):
+                player = self.players_path[i]
+                fig.axes[0].lines[i].set_xdata(player[1])
+                fig.axes[0].lines[i].set_ydata(player[2])
+        return fig
                 
 #-------------------------Player----------------------------------------------
 class Player:
@@ -112,14 +162,79 @@ class Player:
         +color: Players identifying color for animation and player 
             identification.
     """
+    
     grid=Grid()     #Blank grid, needs to be replaced with real grid
     
-    def __init_(self,color):
+    def __init__(self,color='r'):
         self.node=None
         self.color=color
-    
-    #def possible_Move()    
-    
+        
+    """
+    look_sence documentation:
+        add in if it was a 'bnd', player or wall
+    """
+    def look_sense(self,direction='all'):    
+        if direction == 'left':#--------------LEFT----------------------------
+            l_node=self.node.left
+            l_count=0
+            while not l_node == 'bnd' and not l_node.visited:
+                l_count+=1
+                l_node=l_node.left
+            if l_node == "bnd":
+                return [direction,l_count,"bnd"]
+            else:
+                for player in self.grid.active_players:
+                    if player.node is l_node:
+                        return [direction,l_count,"player"]
+                return [direction,l_count,"wall"]
+        elif direction == 'right':#-------------RIGHT-------------------------
+            r_node=self.node.right
+            r_count=0
+            while not r_node == 'bnd' and not r_node.visited:
+                r_count+=1
+                r_node=r_node.right
+            if r_node == "bnd":
+                return [direction,r_count,"bnd"]
+            else:
+                for player in self.grid.active_players:
+                    if player.node is r_node:
+                        return [direction,r_count,"player"]
+                return [direction,r_count,"wall"]
+        elif direction == 'up':#--------------UP------------------------------
+            u_node=self.node.up
+            u_count=0
+            while not u_node == 'bnd' and not u_node.visited:
+                u_count+=1
+                u_node=u_node.up
+            if u_node == "bnd":
+                return [direction,u_count,"bnd"]
+            else:
+                for player in self.grid.active_players:
+                    if player.node is u_node:
+                        return [direction,u_count,"player"]
+                return [direction,u_count,"wall"]
+        elif direction == 'down':#--------------DOWN-------------------------
+            d_node=self.node.down
+            d_count=0
+            while not d_node == 'bnd' and not d_node.visited :
+                d_count+=1
+                d_node=d_node.down
+            if d_node == "bnd":
+                return [direction,d_count,"bnd"]
+            else:
+                for player in self.grid.active_players:
+                    if player.node is d_node:
+                        return [direction,d_count,"player"]
+                return [direction,d_count,"wall"]
+        elif direction == 'all':#--------------ALL----------------------------
+            left = self.look_sense('left')
+            right = self.look_sense('right')
+            up = self.look_sense('up')
+            down = self.look_sense('down')
+            return [left,right,up,down]
+        else:
+            return []
+            
     def move(self): 
         """
         ->The basic move implimented, chooses directions semi-randomly. It 
@@ -174,4 +289,5 @@ class Player:
         elif direction == "right": self.node=self.node.right
         elif direction == "up"   : self.node=self.node.up
         elif direction == "down" : self.node=self.node.down
+        return
     
