@@ -6,7 +6,7 @@ Created on Thu Jan 18 14:59:05 2018
 from Tron import Grid 
 from Justins_player import Open_Dist_Player
 from matplotlib import pyplot as plt
-import tron_helper
+from tron_helper import append_data
 #--------------Functions------------------------------------------------------
 def plot_grid(fig):
     plt.draw()
@@ -71,8 +71,7 @@ while n < num_data:                                 #Repeat untill enough data c
             y.append(decision[i])                   #Add decision to list of desisions
         n+=X.__len__()                              #Add number of eamples collected from round    
         #### ADD FUNCTION HERE#####
-        # save_to_file(file_name, X,y)
-        tron_helper.append_data('training_data.dat', X, y)
+        append_data("Data.txt",X,y)
     if display:
         print('n: '+str(n))
         plt.close(fig)
