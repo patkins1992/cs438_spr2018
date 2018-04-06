@@ -33,7 +33,7 @@ class Grid:
     def __init__(self,players=[], grid_size=1):
         self.grid=[]                        #Grid of Node objects
         self.players_path =[]               #List of [Player,[x-cord],[y-cord]]
-        self.active_players=players         #Players still in the game
+        self.active_players=players.copy()  #Players still in the game
         self.defeted_players=[] 		          #Defeted players
         self.generate_grid(grid_size) 	     #build the self.grid attribute
         self.set_players(players)		         #build the self.players_path attribute
@@ -94,7 +94,7 @@ class Grid:
                     self.grid[x][y].right = "bnd"
         return
                 
-    def move_players(self): 
+    def move_players(self, display= False): 
         moves = [] #List of players moves
         #Step 1 Move all the active players
         for player in self.active_players:
@@ -103,26 +103,30 @@ class Grid:
         players_to_remove=[]
         for player in self.active_players: #Traverse all the active players
             #Checks 1 and 2 Check for simple collision.
-            if player.node == "bnd": #Check 2-----------hit a boundry---------------------------------------------------
+            if player.node == "bnd": #Check 2-----------hit a boundry---------
                 players_to_remove.append(player)
-                print("Cause of death of Player " +player.color+": Player hit a boundry")
-            elif player.node.visited: #Check 1--------------hit a wall-----------------------------------------------------
+                if display:
+                    print("Cause of death of Player " +player.color+": Player hit a boundry")
+            elif player.node.visited: #Check 1--------------hit a wall--------
                players_to_remove.append(player)
                self.add_curr_node_to_path(player)          #Adds node to players current path
-               print("Cause of death of Player " +player.color+": Player hit a wall")
+               if display:
+                   print("Cause of death of Player " +player.color+": Player hit a wall")
             else:
                 #Checks 3 & 4 iterative checks for mutual collisions or stalls
                 for other_player in self.active_players: #check if there was a mutual collision.
                     if other_player.node is player.node and other_player is not player and player not in players_to_remove:
                         players_to_remove.append(player)
                         self.add_curr_node_to_path(player)          #Adds node to players current path
-                        print("Cause of death of Player " +player.color+" : Mutual Collision")
+                        if display:
+                            print("Cause of death of Player " +player.color+" : Mutual Collision")
                 for prev_player in self.players_path: # check that player has move
                     if prev_player[0] is player:
                         if [prev_player[1][-1],prev_player[2][-1]]==player.node.cordinate and player not in players_to_remove:
                             self.defeted_players.append(player)         #Move player to the list of defeted players
                             players_to_remove.append(player)
-                            print("Cause of death of Player " +player.color+": Player dident move")
+                            if display:
+                                print("Cause of death of Player " +player.color+": Player dident move")
                 #Player Survived
                 if player not in players_to_remove:
                     player.node.visited=True            #Sets the node the player moved to as visited
