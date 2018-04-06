@@ -6,6 +6,7 @@ Created on Thu Jan 18 14:59:05 2018
 from Tron import Grid 
 from Justins_player import Open_Dist_Player
 from matplotlib import pyplot as plt
+import tron_helper
 #--------------Functions------------------------------------------------------
 def plot_grid(fig):
     plt.draw()
@@ -71,6 +72,7 @@ while n < num_data:                                 #Repeat untill enough data c
         n+=X.__len__()                              #Add number of eamples collected from round    
         #### ADD FUNCTION HERE#####
         # save_to_file(file_name, X,y)
+        tron_helper.append_data('training_data.dat', X, y)
     if display:
         print('n: '+str(n))
         plt.close(fig)
