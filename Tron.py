@@ -55,6 +55,24 @@ class Grid:
             self.grid[x][y].visited=True    #Set node visited attribute to True
         return
         
+    def get_grid(self,current_node):
+        grid_list=[]
+        for row in self.grid:
+            #a_row=[]
+            for col in row:
+                if col.visited:
+                    if col is current_node:
+                        grid_list.append(1)
+                        #a_row.append(1) #At self represent as 1
+                    else:
+                        grid_list.append(-1)
+                        #a_row.append(-1) #At a wall or other player represent as -1
+                else:
+                    grid_list.append(0)
+                    #a_row.append(0) #Node not visitied represent as 0
+            #grid_list.append(a_row)
+        return grid_list
+    
     def generate_grid(self,grid_size):
         for x in range(grid_size):
             self.grid.append([])  
@@ -77,9 +95,10 @@ class Grid:
         return
                 
     def move_players(self): 
+        moves = [] #List of players moves
         #Step 1 Move all the active players
         for player in self.active_players:
-            player.move() #Player moves themself to their next node
+            moves.append(player.move()) #Player moves themself to their next node
         #Step 2 Remove players that hit an obstical in their move
         players_to_remove=[]
         for player in self.active_players: #Traverse all the active players
@@ -112,9 +131,10 @@ class Grid:
         for player_to_remove in players_to_remove:
             self.defeted_players.append(player_to_remove)
             self.active_players.remove(player_to_remove)
-            player.node.visited=True #If mutual collision need to set to true
+            if not isinstance(player.node, str): 
+                player.node.visited=True #If mutual collision need to set to true
         
-        return
+        return moves
                     
     def add_curr_node_to_path(self,player):
         for a_player in self.players_path:
@@ -258,10 +278,8 @@ class Player:
             pos_moves.append("down")
         if pos_moves.__len__()==0:
             self.directional_move("up")
-        else:
-            i = randint(0,pos_moves.__len__()-1)
-            self.directional_move(pos_moves[i])
-        return
+        i = randint(0,pos_moves.__len__()-1)   
+        return self.directional_move(pos_moves[i])
             
     def directional_move(self,direction):
         """
@@ -285,9 +303,16 @@ class Player:
         |
         -------------------> X
         """
-        if   direction == "left" : self.node=self.node.left
-        elif direction == "right": self.node=self.node.right
-        elif direction == "up"   : self.node=self.node.up
-        elif direction == "down" : self.node=self.node.down
-        return
+        if   direction == "left" : 
+            self.node=self.node.left
+            return [1,0,0,0]
+        elif direction == "right": 
+            self.node=self.node.right
+            return [0,1,0,0]
+        elif direction == "up"   : 
+            self.node=self.node.up
+            return [0,0,1,0]
+        elif direction == "down" : 
+            self.node=self.node.down
+            return [0,0,0,1]
     
