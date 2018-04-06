@@ -65,7 +65,7 @@ class Grid:
                         grid_list.append(1)
                         #a_row.append(1) #At self represent as 1
                     else:
-                        grid_list.append(-1)
+                        grid_list.append(.5)
                         #a_row.append(-1) #At a wall or other player represent as -1
                 else:
                     grid_list.append(0)
