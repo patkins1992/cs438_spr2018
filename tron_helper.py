@@ -45,13 +45,7 @@ def append_data(filename, x, y):
     for i in range(len(x)):
         #create a string that contains one list from x, a ":", then one list
         #from y
-        x_str=str(x[i])                     #turn list to a tring
-        x_str=x_str.replace('[','')         #Remove []
-        x_str=x_str.replace(']','')
-        y_str=str(y[i])
-        y_str=y_str.replace('[','')
-        y_str=y_str.replace(']','')
-        add_data = x_str + ":" + y_str + "\n"
+        add_data = x[i] + ":" + y[i] + "\n"
         #append that string to the file
         training_data.write(add_data)
     #close the file
@@ -71,7 +65,6 @@ def format_input_data(filename):
              If there is a problem with the data file, ([0],[0]) is returned.
     Raises: OSError or IOError if there is a problem with the data file
     """
-    #create the arrays to return
     x = []
     y = []
     #open the file containing the training data
@@ -81,14 +74,37 @@ def format_input_data(filename):
         #the first part of the line into x, and the second part of the line into
         #y.
         for line in training_data:
+            line = str.replace(line, '[', '')
+            line = str.replace(line, ']', '')
+            line = str.replace(line, '\'', '')
+            line = str.replace(line, '\n', '')
             line_list = line.split(':')
-            x.append(line_list[0])
-            y.append(line_list[1])
+            #x_list = str.replace(line_list[0], "'", "")
+            single_x_record = []
+            x_line_list = line_list[0].split(', ')
+            for i in x_line_list:
+                i = float(i)
+                single_x_record.append(i)
+            x_record = np.array(single_x_record)
+            x.append(x_record)
+            #x.append(np.array(line_list[0]))
+            #y.append(np.array(line_list[1]))
+            single_y_record = []
+            y_line_list = line_list[1].split(', ')
+            for j in y_line_list:
+                j = float(j)
+                single_y_record.append(j)
+            y_record = np.array(single_y_record)
+            y.append(y_record)
         #close the file
         training_data.close()
+        x = np.array(x)
+        y = np.array(y)
         return(x, y)
     except(OSError, IOError):
-        x = [0]
-        y = [0]
+        x.append(0)
+        y.append(0)
+        x = np.array(x)
+        y = np.array(y)
         return(x, y)
 
