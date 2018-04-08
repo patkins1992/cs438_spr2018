@@ -30,7 +30,7 @@ x_test = []
 y_train = []
 y_test = []
 #the data shuffled and split between train and test sets
-(x_train, y_train) = tron_helper.format_input_data('training_data.dat')
+(x_train, y_train) = tron_helper.format_input_data('Data.txt')
 x_train, x_test = train_test_split(x_train, train_size=0.8, test_size = 0.2)
 y_train, y_test = train_test_split(y_train, train_size=0.8, test_size = 0.2)
 print(x_train[0])
