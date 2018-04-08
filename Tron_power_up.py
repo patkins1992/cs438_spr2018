@@ -4,8 +4,7 @@ Created on Thu Jan 18 14:59:05 2018
 """
 
 from Tron import Grid 
-from Tron import Player
-from Justins_player import Open_Dist_Player
+from Tron_players import Open_Dist_Player
 from matplotlib import pyplot as plt
 
 

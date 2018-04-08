@@ -4,7 +4,7 @@ Created on Thu Jan 18 14:59:05 2018
 """
 #--------------Imports--------------------------------------------------------
 from Tron import Grid 
-from Justins_player import Open_Dist_Player
+from Tron_players import Open_Dist_Player
 from matplotlib import pyplot as plt
 from tron_helper import append_data
 #--------------Functions------------------------------------------------------
@@ -71,7 +71,7 @@ while n < num_data:                                 #Repeat untill enough data c
             y.append(decision[i])                   #Add decision to list of desisions
         n+=X.__len__()                              #Add number of eamples collected from round    
         #### ADD FUNCTION HERE#####
-        append_data("Data.txt",X,y)
+        append_data("Data_2.txt",X,y)
     if display:
         print('n: '+str(n))
         plt.close(fig)

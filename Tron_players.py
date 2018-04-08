@@ -14,9 +14,7 @@ class Open_Dist_Player(Player):
             if(max_open_dist<direction[1]):
                 max_open_dist = direction[1]
                 move_direction= direction[0]       
-        self.directional_move(move_direction)
-        return
+        return self.directional_move(move_direction)
         
 
-        
         
