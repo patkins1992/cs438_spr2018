@@ -45,7 +45,7 @@ def append_data(filename, x, y):
     for i in range(len(x)):
         #create a string that contains one list from x, a ":", then one list
         #from y
-        add_data = x[i] + ":" + y[i] + "\n"
+        add_data = str(x[i]) + ":" + str(y[i]) + "\n"
         #append that string to the file
         training_data.write(add_data)
     #close the file
