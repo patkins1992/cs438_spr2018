@@ -55,22 +55,22 @@ class Grid:
             self.grid[x][y].visited=True    #Set node visited attribute to True
         return
         
-    def get_grid(self,current_node):
+    def get_grid(self,current_node,value=(1,.5,0)):
+        """
+        get_grid returns a list representation of the grid, where different atributes of the grid
+        are represented by a value (self,wall,open_space)
+        """
         grid_list=[]
-        for row in self.grid:
-            #a_row=[]
-            for col in row:
-                if col.visited:
+        for row in self.grid:                       #iterate through rows in grid
+            for col in row:                         #itereate through nides in a row
+                if col.visited:                     
                     if col is current_node:
-                        grid_list.append(1)
-                        #a_row.append(1) #At self represent as 1
+                        grid_list.append(value[0])  #If current node is self add value[0] 
+                        
                     else:
-                        grid_list.append(.5)
-                        #a_row.append(-1) #At a wall or other player represent as -1
+                        grid_list.append(value[1])  #If current node is visted add value[1]
                 else:
-                    grid_list.append(0)
-                    #a_row.append(0) #Node not visitied represent as 0
-            #grid_list.append(a_row)
+                    grid_list.append(value[2])      #if current node is open add value[2]
         return grid_list
     
     def generate_grid(self,grid_size):
