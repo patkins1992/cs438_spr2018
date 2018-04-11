@@ -34,6 +34,8 @@ class Grid:
         self.grid=[]                        #Grid of Node objects
         self.players_path =[]               #List of [Player,[x-cord],[y-cord]]
         self.active_players=players.copy()  #Players still in the game
+        for player in self.active_players:  #Set this grid as the grid of all the players
+            player.grid=self                #Set players grid
         self.defeted_players=[] 		          #Defeted players
         self.generate_grid(grid_size) 	     #build the self.grid attribute
         self.set_players(players)		         #build the self.players_path attribute
@@ -187,11 +189,12 @@ class Player:
             identification.
     """
     
-    grid=Grid()     #Blank grid, needs to be replaced with real grid
+    
     
     def __init__(self,color='r'):
         self.node=None
         self.color=color
+        self.grid=Grid()
         
     """
     look_sence documentation:
