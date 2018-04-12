@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 
 batch_size = 128
 #num_classes = 4
-epochs = 120
+epochs = 30
 #set keras' random seed for reproducibility
 seed(3)
 #set tensorflow's random seed for reproducibility
@@ -32,7 +32,6 @@ set_random_seed(3)
 #get the input (x_train), and the training output (y_train)
 (x_train, y_train) = tron_helper.format_input_data('test_1.txt')
 print(x_train.shape[0], 'total samples')
-
 model = Sequential()
 #model.add(Dense(512, activation='relu', input_shape=(784,)))
 #diane - this will be 400 when board is 20 x 20
@@ -53,4 +52,4 @@ history = model.fit(x_train, y_train,
                     epochs=epochs,
                     verbose=1)
 
-model.save_weights('tron_wts.h5')
+model.save('tron_wts.h5')

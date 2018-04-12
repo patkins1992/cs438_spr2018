@@ -4,14 +4,14 @@ Created on Thu Jan 18 14:59:05 2018
 """
 
 from Tron import Grid 
-from Tron_players import Open_Dist_Player
+from Tron_players import Open_Dist_Player, NN_Player
 from matplotlib import pyplot as plt
 
 
 #Create a grid of size grid_size
 grid_size=10
 #Initilize the list of players to play on the grid
-list_of_player=[Open_Dist_Player('r'),Open_Dist_Player('b')]#,Open_Dist_Player('g'),Player('c'),
+list_of_player=[Open_Dist_Player('r'),NN_Player('b')]#,Open_Dist_Player('g'),Player('c'),
                # Player('m'),Player('y')]
                
 #Create grid
