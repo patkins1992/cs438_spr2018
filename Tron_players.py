@@ -9,8 +9,9 @@ import tron_helper
 import keras.models
 import numpy as np
 
-model = keras.models.load_model('tron_wts.h5')
-
+model = keras.models.load_model('tron_model_look_sense.h5')
+#model_type = 'board_state'
+model_type = 'look_sense'
 class Open_Dist_Player(Player):
     def move(self):
         look = self.look_sense()
@@ -23,14 +24,26 @@ class Open_Dist_Player(Player):
 
 class NN_Player(Player):
     def move(self):
-        #get the board state
-        n=self.node
-        board_state = self.grid.get_grid(n, value=(1, 0.5, 0))
-        #format the board state so the neural net can use it to predict the best move
-        board_state = [board_state] #neural net needs list containing list that contains board state
-        board_state = np.array(board_state)
-        #ask the neural net to predict the move based on the board state
-        move_direction = model.predict(board_state)
+        if model_type == 'board_state':
+            #get the board state
+            n=self.node
+            board_state = self.grid.get_grid(n, value=(1, 0.5, 0))
+            #format the board state so the neural net can use it to predict the best move
+            board_state = [board_state] #neural net needs list containing list that contains board state
+            board_state = np.array(board_state)
+            #ask the neural net to predict the move based on the board state
+            move_direction = model.predict(board_state)
+        elif model_type == 'look_sense':
+            look = self.look_sense()
+            #print(str(look))
+            reduced_look = []
+            for x in range(0,4):
+                reduced_look.append(look[x][1])
+            enclosed_reduced_look = []
+            enclosed_reduced_look.append(reduced_look)
+            enclosed_reduced_look = np.array(enclosed_reduced_look)
+            #print(str(enclosed_reduced_look))
+            move_direction = model.predict(enclosed_reduced_look)
         #print(move_direction)
         #interpret the prediction
         #the result is a set of 4 floats, [left right up down]

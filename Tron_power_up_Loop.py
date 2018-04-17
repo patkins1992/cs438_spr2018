@@ -4,7 +4,7 @@ Created on Thu Jan 18 14:59:05 2018
 """
 #--------------Imports--------------------------------------------------------
 from Tron import Grid 
-from Tron_players import Open_Dist_Player
+from Tron_players import Open_Dist_Player, NN_Player
 from matplotlib import pyplot as plt
 from tron_helper import append_data
 #--------------Functions------------------------------------------------------
@@ -15,13 +15,13 @@ def plot_grid(fig):
     fig.canvas.flush_events()
 #--------------Parameters-----------------------------------------------------
 grid_size=10                                        #Create a grid of size grid_size
-density=.20                                          #Minimal board density to store (ie .6=>60/100 nodes visited for 10x10 board) 
-data_values=(.25,.5,1)                                #Values to represent board atributes (current-player,wall,open spot)
-num_data=10                                        #Munimal number of example to collect
-file_name="test_1.txt"                                #file name of data
+density=.01                                          #Minimal board density to store (ie .6=>60/100 nodes visited for 10x10 board) 
+data_values=(1, 0.5, 0)                                #Values to represent board atributes (current-player,wall,open spot)
+num_data=1000000                                        #Minimal number of example to collect
+file_name="board_state_input.txt"                                #file name of data
 display=False                                       #Display game as its played
 list_of_player=[Open_Dist_Player('r'),              #Initilize the list of players 
-                Open_Dist_Player('b')]
+                Open_Dist_Player('b'),]
 #--------------Loop untill untill enough data is collected--------------------
 n=0                                                 #initilize number of examples collected to 0
 while n < num_data:                                 #Repeat untill enough data collected
@@ -40,15 +40,15 @@ while n < num_data:                                 #Repeat untill enough data c
     while the_grid.active_players.__len__() > 1:    #Loop untill no players remain
         bs_turn=[]                                  #list of board states per player per turn
         for player in the_grid.active_players:      #Iterate through active players
-            ls = player.look_sense()
-            score=[]
-            for dirr in ls:
-                score.append(dirr[1])
-            #score=score/sum(score)
-            bs_turn.append(score)
-            #g=the_grid.get_grid(player.node,        #get board state from perspective of player
-            #                    value=data_values)  #Set board representation      
-            #bs_turn.append(g)                       #Add board state to bs_turn
+#            ls = player.look_sense()
+#            score=[]
+#            for dirr in ls:
+#                score.append(dirr[1])
+#            #score=score/sum(score)
+#            bs_turn.append(score)
+            g=the_grid.get_grid(player.node,        #get board state from perspective of player
+                                value=data_values)  #Set board representation      
+            bs_turn.append(g)                       #Add board state to bs_turn
         board_states.append(bs_turn)                #Add all board states for the turn
         moves = the_grid.move_players()             #Advance all the players
         player_decisions.append(moves)              #Add all players moves to list of moves
